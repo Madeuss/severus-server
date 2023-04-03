@@ -13,28 +13,30 @@ datasource db {
 model User {
   id String @default(cuid()) @id
   name String
-  email String   @unique
+  username String @unique
+  email String @unique
   password String
   avatar String?
-
-  followers Follows[] @relation("follower")
-  following Follows[] @relation("following")
+  followers Follow[] @relation("UserFollowing")
+  following Follow[] @relation("UserFollowers")
   posts Post[] @relation("author")
   likes Post[] @relation()
 
-  createdAt DateTime  @default(now()) @map(name: "created_at")
-  updatedAt DateTime  @updatedAt @map(name: "updated_at")
+  createdAt DateTime @default(now()) @map(name: "created_at")
+  updatedAt DateTime @updatedAt @map(name: "updated_at")
 
   @@map(name: "users")
 }
 
-model Follows {
-  follower User @relation("following", fields: [followerId], references: [id])
+model Follow {
+  id String @default(cuid()) @id
+  follower User @relation("UserFollowing", fields: [followerId], references: [id])
   followerId String
-  following User @relation("follower", fields: [followingId], references: [id])
+  following User @relation("UserFollowers", fields: [followingId], references: [id])
   followingId String
+  createdAt DateTime @default(now())
+  @@unique([followerId, followingId])
 
-  @@id([followerId, followingId])
   @@map(name: "follows")
 }
 
@@ -48,8 +50,8 @@ model Post {
   author User @relation("author", fields: [authorId], references: [id])
   likedBy User[] @relation()
 
-  createdAt DateTime  @default(now()) @map(name: "created_at")
-  updatedAt DateTime  @updatedAt @map(name: "updated_at")
+  createdAt DateTime @default(now()) @map(name: "created_at")
+  updatedAt DateTime @updatedAt @map(name: "updated_at")
 
   @@map(name: "posts")
 }

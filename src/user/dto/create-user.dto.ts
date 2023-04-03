@@ -24,6 +24,9 @@ export class CreateUserDto extends User {
   name: string
 
   @IsString()
+  username: string
+
+  @IsString()
   @IsOptional()
   avatar: string
 }
