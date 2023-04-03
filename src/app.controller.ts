@@ -1,4 +1,4 @@
-import { Controller, Get } from '@nestjs/common'
+import { Controller, Get, Patch } from '@nestjs/common'
 import { AppService } from './app.service'
 import { CurrentUser } from 'src/auth/decorators/current-user.decorator'
 import { User } from 'src/user/entities/user.entity'

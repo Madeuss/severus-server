@@ -1,6 +1,7 @@
 import { User } from '../entities/user.entity'
 import {
   IsEmail,
+  IsOptional,
   IsString,
   Matches,
   MaxLength,
@@ -21,4 +22,8 @@ export class CreateUserDto extends User {
 
   @IsString()
   name: string
+
+  @IsString()
+  @IsOptional()
+  avatar: string
 }
