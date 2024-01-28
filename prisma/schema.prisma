@@ -11,48 +11,43 @@ datasource db {
 }
 
 model User {
-  id String @default(cuid()) @id
-  name String
-  username String @unique
-  email String @unique
+  id       String  @id @default(cuid())
+  name     String
+  username String  @unique
+  email    String  @unique
   password String
-  avatar String?
-  followers Follow[] @relation("UserFollowing")
-  following Follow[] @relation("UserFollowers")
-  posts Post[] @relation("author")
-  likes Post[] @relation()
+  avatar   String?
 
   createdAt DateTime @default(now()) @map(name: "created_at")
   updatedAt DateTime @updatedAt @map(name: "updated_at")
 
-  @@map(name: "users")
-}
-
-model Follow {
-  id String @default(cuid()) @id
-  follower User @relation("UserFollowing", fields: [followerId], references: [id])
-  followerId String
-  following User @relation("UserFollowers", fields: [followingId], references: [id])
-  followingId String
-  createdAt DateTime @default(now())
-  @@unique([followerId, followingId])
-
-  @@map(name: "follows")
+  posts     Post[]
+  likes     Like[]
+  followers User[] @relation(name: "Followers")
+  following User[] @relation(name: "Followers")
 }
 
 model Post {
-  id String @default(cuid()) @id
-  title String?
-  content String
-  published Boolean @default(false)
-
-  authorId String
-  author User @relation("author", fields: [authorId], references: [id])
-  likedBy User[] @relation()
-
+  id        String   @id @default(cuid())
+  userId    String
+  title     String?
+  content   String
   createdAt DateTime @default(now()) @map(name: "created_at")
   updatedAt DateTime @updatedAt @map(name: "updated_at")
 
-  @@map(name: "posts")
+  user  User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  likes Like[]
+
+  @@index([userId])
 }
 
+model Like {
+  userId String
+  postId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@id([userId, postId])
+  @@index([userId])
+  @@index([postId])
+}
