@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -11,32 +8,35 @@ datasource db {
 }
 
 model User {
-  id       String  @id @default(cuid())
-  name     String
-  username String  @unique
-  email    String  @unique
-  password String
-  avatar   String?
+  id         String    @id @default(cuid())
+  name       String
+  username   String    @unique
+  email      String    @unique
+  password   String
+  avatar     String?
+  createdAt  DateTime  @default(now()) @map(name: "created_at")
+  updatedAt  DateTime  @updatedAt @map(name: "updated_at")
 
-  createdAt DateTime @default(now()) @map(name: "created_at")
-  updatedAt DateTime @updatedAt @map(name: "updated_at")
-
-  posts     Post[]
-  likes     Like[]
-  followers User[] @relation(name: "Followers")
-  following User[] @relation(name: "Followers")
+  posts      Post[]
+  likes      Like[]
+  followers  User[]    @relation(name: "Followers")
+  following  User[]    @relation(name: "Followers")
+  comments   Comment[]
+  savedPosts SavedPost[]
 }
 
 model Post {
-  id        String   @id @default(cuid())
+  id        String    @id @default(cuid())
   userId    String
   title     String?
   content   String
-  createdAt DateTime @default(now()) @map(name: "created_at")
-  updatedAt DateTime @updatedAt @map(name: "updated_at")
+  createdAt DateTime  @default(now()) @map(name: "created_at")
+  updatedAt DateTime  @updatedAt @map(name: "updated_at")
 
-  user  User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  likes Like[]
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  likes     Like[]
+  comments  Comment[]
+  savedPosts SavedPost[]
 
   @@index([userId])
 }
@@ -44,10 +44,39 @@ model Post {
 model Like {
   userId String
   postId String
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user   User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post   Post      @relation(fields: [postId], references: [id], onDelete: Cascade)
 
   @@id([userId, postId])
+  @@index([userId])
+  @@index([postId])
+}
+
+model Comment {
+  id        String    @id @default(cuid())
+  userId    String
+  postId    String
+  content   String
+  createdAt DateTime  @default(now()) @map(name: "created_at")
+  updatedAt DateTime  @updatedAt @map(name: "updated_at")
+
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post      Post      @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([postId])
+}
+
+model SavedPost {
+  id        String    @id @default(cuid())
+  userId    String
+  postId    String
+  createdAt DateTime  @default(now()) @map(name: "created_at")
+  updatedAt DateTime  @updatedAt @map(name: "updated_at")
+
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post      Post      @relation(fields: [postId], references: [id], onDelete: Cascade)
+
   @@index([userId])
   @@index([postId])
 }

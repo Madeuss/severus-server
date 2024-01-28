@@ -28,6 +28,7 @@ export class PostService {
       include: {
         user: true,
         likes: true,
+        comments: true,
       },
     })
   }
@@ -40,6 +41,7 @@ export class PostService {
       include: {
         user: true,
         likes: true,
+        comments: true,
       },
     })
   }
