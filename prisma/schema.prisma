@@ -8,75 +8,79 @@ datasource db {
 }
 
 model User {
-  id         String    @id @default(cuid())
-  name       String
-  username   String    @unique
-  email      String    @unique
-  password   String
-  avatar     String?
-  createdAt  DateTime  @default(now()) @map(name: "created_at")
-  updatedAt  DateTime  @updatedAt @map(name: "updated_at")
+  id        String   @id @default(cuid())
+  name      String
+  username  String   @unique
+  email     String   @unique
+  password  String
+  avatar    String?
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
-  posts      Post[]
-  likes      Like[]
-  followers  User[]    @relation(name: "Followers")
-  following  User[]    @relation(name: "Followers")
-  comments   Comment[]
-  savedPosts SavedPost[]
+  posts       Post[]
+  likes       Like[]
+  comments    Comment[]
+  savedPosts  SavedPost[]
+
+  // Correção da relação de seguidores:
+  followedBy User[] @relation("UserFollows")
+  following  User[] @relation("UserFollows")
+
+  @@map("users")
 }
 
 model Post {
-  id        String    @id @default(cuid())
-  userId    String
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
   title     String?
   content   String
-  createdAt DateTime  @default(now()) @map(name: "created_at")
-  updatedAt DateTime  @updatedAt @map(name: "updated_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
-  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  likes     Like[]
-  comments  Comment[]
+  user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  likes      Like[]
+  comments   Comment[]
   savedPosts SavedPost[]
 
   @@index([userId])
+  @@map("posts")
 }
 
 model Like {
-  userId String
-  postId String
-  user   User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  post   Post      @relation(fields: [postId], references: [id], onDelete: Cascade)
+  userId String @map("user_id")
+  postId String @map("post_id")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
 
   @@id([userId, postId])
-  @@index([userId])
-  @@index([postId])
+  @@map("likes")
 }
 
 model Comment {
-  id        String    @id @default(cuid())
-  userId    String
-  postId    String
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  postId    String   @map("post_id")
   content   String
-  createdAt DateTime  @default(now()) @map(name: "created_at")
-  updatedAt DateTime  @updatedAt @map(name: "updated_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
-  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  post      Post      @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([postId])
+  @@map("comments")
 }
 
 model SavedPost {
-  id        String    @id @default(cuid())
-  userId    String
-  postId    String
-  createdAt DateTime  @default(now()) @map(name: "created_at")
-  updatedAt DateTime  @updatedAt @map(name: "updated_at")
+  userId    String   @map("user_id")
+  postId    String   @map("post_id")
+  createdAt DateTime @default(now()) @map("created_at")
 
-  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  post      Post      @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
 
-  @@index([userId])
-  @@index([postId])
+  @@id([userId, postId])
+  @@map("saved_posts")
 }
