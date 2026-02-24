@@ -6,13 +6,15 @@ import { UserModule } from 'src/user/user.module'
 import { JwtModule } from '@nestjs/jwt'
 import { JwtStrategy } from 'src/auth/strategies/jwt.strategy'
 import { LoginValidationMiddleware } from 'src/auth/middleware/login-validation.middleware'
+import { PrismaModule } from 'src/prisma/prisma.module'
 
 @Module({
   imports: [
     UserModule,
+    PrismaModule,
     JwtModule.register({
       secret: process.env.JWT_SECRET,
-      signOptions: { expiresIn: '24h' },
+      signOptions: { expiresIn: '72h' },
     }),
   ],
   controllers: [AuthController],

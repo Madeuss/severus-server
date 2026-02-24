@@ -84,3 +84,12 @@ model SavedPost {
   @@id([userId, postId])
   @@map("saved_posts")
 }
+
+model RevokedToken {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  expiresAt DateTime @map("expires_at")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("revoked_tokens")
+}
