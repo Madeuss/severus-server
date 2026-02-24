@@ -11,9 +11,11 @@ async function bootstrap() {
       transform: true,
       whitelist: true,
       forbidNonWhitelisted: true,
-    })
+    }),
   )
 
+  // Enable CORS for local frontend
+  app.enableCors({ origin: ['http://localhost:8081'] })
   await app.listen(3000)
 }
 bootstrap()
